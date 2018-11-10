@@ -51,10 +51,12 @@ class PlayerNamespace(Namespace):
 
     def on_connect(self):
         logger.info("Player {} connected.".format(request.sid))
+        print("Player", request.sid, "connecting")
         self.parent.register_player_connect(request.sid)
 
     def on_disconnect(self):
         logger.info("Player {} disconnected.".format(request.sid))
+        print("Player", request.sid, "disconnecting")
         room_id = self.parent.register_player_disconnect(request.sid)
 
         if room_id is not None:
