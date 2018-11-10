@@ -40,12 +40,12 @@ Sent from server to iOS client and web client when game starts.
    "pkt_name": "start_game",
    "prompts": [
       {
-         "user_name": user 1 name (string),
-         "prompt": prompt 1 (string)
+         "user_name": "user 1 name (string)",
+         "prompt": "prompt 1 (string)"
       },
       {
-         "user_name": user 2 name (string),
-         "prompt": prompt 2 (string)
+         "user_name": "user 2 name (string)",
+         "prompt": "prompt 2 (string)"
       }
    ]
 }
@@ -57,10 +57,10 @@ Sent from iOS client to server when line is drawn.
 ```json
 {
    "pkt_name": "draw_data_ios",
-   "color": color (string)
+   "color": "color (string)"
    "points": [
-      {"x": x1 (int), "y": y1 (int)},
-      {"x": x2 (int), "y": y2 (int)},
+      {"x": "x1 (int)", "y": "y1 (int)"},
+      {"x": "x2 (int)", "y": "y2 (int)"},
    ]
 }
 ```
@@ -71,13 +71,13 @@ Sent from server to web client to server when draw data is received
 ```json
 {
    "pkt_name": "draw_data_web",
-   "color": color (string)
+   "color": "color (string)"
    "draw_data": [
       { 
-         "user_name": user 1 name (string)
+         "user_name": "user 1 name (string)"
          "points": [
-            {"x": x1 (int), "y": y1 (int)},
-            {"x": x2 (int), "y": y2 (int)},
+            {"x": "x1 (int)", "y": "y1 (int)"},
+            {"x": "x2 (int)", "y": "y2 (int)"},
          ]
       }
    ]
