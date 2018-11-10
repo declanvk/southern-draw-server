@@ -20,6 +20,11 @@ Sent from iOS client to server when user types in code.
 }
 ```
 
+## Send Code (2\*)
+Send from server to iOS client to indicate that it was a correct room code.
+Emit a simple string with event name `join_room_status`
+
+
 ## Send Players (3)
 Sent from server to web client when a player joins.
 ```json
@@ -61,7 +66,11 @@ Sent from iOS client to server when line is drawn.
     "points": [
         {"x": "x1 (int)", "y": "y1 (int)"},
         {"x": "x2 (int)", "y": "y2 (int)"},
-    ]
+    ],
+    "screen_dim": {
+        "width": "width in pixels (int)",
+        "height": "height in pixels (int)"
+    }
 }
 ```
 ### End the Current Line and Start New Line
@@ -78,6 +87,10 @@ Sent from server to web client to server when draw data is received
 {
     "pkt_name": "draw_data_web",
     "user_name": "user 1 name (string)",
+    "screen_dim": {
+        "width": "width in pixels (int)",
+        "height": "height in pixels (int)"
+    },
     "lines": [
         {
             "color": "color (string)",
