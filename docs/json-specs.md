@@ -42,21 +42,22 @@ Sent from server to web client when a player joins.
 ```
 
 ## Send Start Game (4)
-Sent from server to iOS client and web client when game starts.
+Sent from server to iOS client when the game starts
 
 ```json
 {
     "pkt_name": "start_game",
-    "prompts": [
-        {
-            "user_name": "user 1 name (string)",
-            "prompt": "prompt 1 (string)"
-        },
-        {
-            "user_name": "user 2 name (string)",
-            "prompt": "prompt 2 (string)"
-        }
-    ]
+    "prompt": "Prompt (string)"
+}
+```
+## Send Start Game (4*)
+Sent from server to web when the game starts
+
+```json
+{
+    "pkt_name": "start_game",
+    "player1" : "name (String)",
+    "player2" : "name (String)"
 }
 ```
 
