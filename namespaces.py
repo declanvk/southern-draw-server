@@ -1,6 +1,11 @@
 from flask import request
 from flask_socketio import Namespace, emit, join_room, leave_room
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
 class WebNamespace(Namespace):
 
     def __init__(self, *args, **kwargs):
@@ -45,9 +50,11 @@ class PlayerNamespace(Namespace):
         self.parent = kwargs['parent']
 
     def on_connect(self):
+        logger.info("Player {} connected.".format(request.sid))
         self.parent.register_player_connect(request.sid)
 
     def on_disconnect(self):
+        logger.info("Player {} disconnected.".format(request.sid))
         room_id = self.parent.register_player_disconnect(request.sid)
 
         if room_id is not None:
@@ -57,6 +64,8 @@ class PlayerNamespace(Namespace):
         room_number = data['room_number']
         user_name = data['user_name']
         screen_dim = data['screen_dim']
+
+        logger.info("Player {} request to join room {}.".format(request.sid, room_number))
 
         room_id = self.parent.join_room_message(request.sid, room_number, user_name, screen_dim)
 
