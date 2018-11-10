@@ -5,7 +5,7 @@ Sent from server to web client as soon as socket is opened
 ```json
 {
    "pkt_name": "room_number",
-   "room_number": room number (string)
+   "room_number": "room number (string)"
 }
 ```
 
@@ -15,8 +15,8 @@ Sent from iOS client to server when user types in code.
 ```json
 {
    "pkt_name": "code",
-   "room_number": room number (string),
-   "user_name": user name (string)
+   "room_number": "room number (string)",
+   "user_name": "user name (string)"
 }
 ```
 
@@ -26,8 +26,8 @@ Sent from server to web client when a player joins.
 {
    "pkt_name": "players",
    "players": [
-      {"user_name": user 1 name (string)},
-      {"user_name": user 2 name (string)}
+      {"user_name": "user 1 name (string)"},
+      {"user_name": "user 2 name (string)"}
    ]
 }
 ```
