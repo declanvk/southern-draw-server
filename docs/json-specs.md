@@ -46,7 +46,7 @@ Sent from server to iOS client when the game starts
 
 ```json
 {
-    "pkt_name": "start_game",
+    "pkt_name": "start_game_ios",
     "prompt": "Prompt (string)"
 }
 ```
@@ -55,7 +55,7 @@ Sent from server to web when the game starts
 
 ```json
 {
-    "pkt_name": "start_game",
+    "pkt_name": "start_game_web",
     "player1" : "name (String)",
     "player2" : "name (String)"
 }
