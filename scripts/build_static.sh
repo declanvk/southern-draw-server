@@ -12,7 +12,7 @@ WEBSITE_DIR="${SCRIPTS_DIR}/../website"
 cd $WEBSITE_DIR
 
 npm install
-npm build
+npm run build
 
 # Now in main server directory
 cd ..
