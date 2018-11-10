@@ -1,18 +1,23 @@
 import logging
+import json
 from socketIO_client import SocketIO, BaseNamespace
 
-class TestNamespace(BaseNamespace):
-
-    def on_message_response(self, *args):
-        print('on_aaa_response', args)
-        self.emit('bbb')
+class PlayerNamespace(BaseNamespace):
 
     def on_room_number(self, *args):
         print(*args)
 
+class WebNamespace(BaseNamespace):
+
+    def on_new_room(self, data):
+        player = socketIO.define(PlayerNamespace, '/game/player')
+        player.emit('join_room', {
+            'room_number': data['room_number'],
+            'user_name': 'Declan Kelley'
+        })
+
 socketIO = SocketIO('127.0.0.1', 8000)
 
-test_namespace = socketIO.define(TestNamespace, '/game')
-test_namespace.emit('message')
+web = socketIO.define(WebNamespace, '/game/web')
 
-socketIO.wait(seconds=5)
+socketIO.wait()

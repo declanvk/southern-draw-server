@@ -76,7 +76,7 @@ class PlayerNamespace(Namespace):
             leave_room(request.sid, room_id)
 
     def on_join_room(self, data):
-        room_number = data['room_nume']
+        room_number = data['room_number']
         user_name = data['user_name']
 
         room_id = self.parent.join_room_message(request.sid, room_number, user_name)
