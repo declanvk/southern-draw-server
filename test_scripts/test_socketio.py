@@ -13,7 +13,8 @@ class WebNamespace(BaseNamespace):
         player = socketIO.define(PlayerNamespace, '/game/player')
         player.emit('join_room', {
             'room_number': data['room_number'],
-            'user_name': 'Declan Kelley'
+            'user_name': 'Declan Kelley',
+            'screen_dim': {'width': 800, 'height': 600}
         })
 
 socketIO = SocketIO('127.0.0.1', 8000)

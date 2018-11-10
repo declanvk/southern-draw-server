@@ -67,7 +67,7 @@ class Server:
             lounge = self.lounges[lounge_id]
 
             # If it does, remove the disconnecting player
-            lounge['player_client'].remove(player_id)
+            lounge['player_clients'].remove(player_id)
 
             # Attempt to delete the lounge
             self.try_lounge_cleanup(lounge, lounge_id)
@@ -175,9 +175,9 @@ class Server:
         user_name = player['user_name']
         self.web_namespace.send_draw_data(web_id, user_name, screen_dim, lines)
 
-    def try_cleanup_lounge(self, lounge, lounge_id):
-        if lounge['player_client'] is not None and \
-               len(lounge['player_client']) == 0 and \
+    def try_lounge_cleanup(self, lounge, lounge_id):
+        if lounge.get('player_clients') is not None and \
+               len(lounge['player_clients']) == 0 and \
                lounge['web_client'] is None:
                del self.lounges[lounge_id]
 
