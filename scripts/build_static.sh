@@ -14,4 +14,9 @@ cd $WEBSITE_DIR
 npm install
 npm build
 
+# Now in main server directory
+cd ..
+
+export SOUTHERN_STATIC_FOLDER="${PWD}/website/dist"
+
 cd $ORIGINAL_DIR
