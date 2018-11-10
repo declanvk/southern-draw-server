@@ -16,7 +16,11 @@ Sent from iOS client to server when user types in code.
 {
     "pkt_name": "join_room",
     "room_number": "room number (string)",
-    "user_name": "user name (string)"
+    "user_name": "user name (string)",
+    "screen_dim": {
+        "width": "width in pixels (int)",
+        "height": "height in pixels (int)"
+    }
 }
 ```
 
@@ -67,10 +71,6 @@ Sent from iOS client to server when line is drawn.
         {"x": "x1 (int)", "y": "y1 (int)"},
         {"x": "x2 (int)", "y": "y2 (int)"},
     ],
-    "screen_dim": {
-        "width": "width in pixels (int)",
-        "height": "height in pixels (int)"
-    }
 }
 ```
 ### End the Current Line and Start New Line
