@@ -3,13 +3,16 @@ from socketIO_client import SocketIO, BaseNamespace
 
 class TestNamespace(BaseNamespace):
 
-    def on_aaa_response(self, *args):
+    def on_message_response(self, *args):
         print('on_aaa_response', args)
         self.emit('bbb')
 
+    def on_room_number(self, *args):
+        print(*args)
+
 socketIO = SocketIO('127.0.0.1', 8000)
 
-test_namespace = socketIO.define(TestNamespace, '/games')
-test_namespace.emit('aaa')
+test_namespace = socketIO.define(TestNamespace, '/game')
+test_namespace.emit('message')
 
-socketIO.wait(seconds=1)
+socketIO.wait(seconds=5)
