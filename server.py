@@ -4,6 +4,11 @@ from os import getenv
 from pathlib import Path
 import random
 import logging
+from namespaces import WebNamespace, PlayerNamespace
+
+IDENTIFIER_LEN = 6
+WEB_ENDPOINT = '/game/web'
+PLAYER_ENDPOINT = '/game/player'
 
 # create logger with '__name__'
 logger = logging.getLogger(__name__)
@@ -24,79 +29,6 @@ def main_page():
 def static_content(subpath):
     return send_from_directory(app.config['STATIC_FOLDER'], subpath)
 
-class WebNamespace(Namespace):
-
-    def __init__(self, *args, **kwargs):
-        super(WebNamespace, self).__init__(*args, **{key: kwargs[key] for key in kwargs if key != 'parent'})
-
-        if 'parent' not in kwargs:
-            raise ValueError("'parent' keyword not found in namespace init")
-
-        self.parent = kwargs['parent']
-
-    def on_connect(self):
-        logger.info('Web interface {} connected'.format(request.sid))
-        self.parent.register_web_connect(request.sid)
-
-    def on_disconnect(self):
-        logger.info('Web interface {} disconnected'.format(request.sid))
-        self.parent.register_web_disconnect(request.sid)
-
-    def send_new_room(self, conn_id, room_number):
-        self.emit('new_room', { 'pkt_type': 'new_room', 'room_number': room_number }, room=conn_id)
-
-    def send_all_players(self, conn_id, players):
-        self.emit('all_players', { 'pkt_type': 'all_players', 'players': players}, room=conn_id)
-
-    def send_start_game(self, conn_id, prompt_player_pairs):
-        self.emit('start_game', { 'pkt_type': 'start_game', 'prompts': prompt_player_pairs }, room=conn_id)
-
-    def send_draw_data(self, conn_id, user_name, lines):
-        self.emit('draw_data_web', { 'pkt_type': 'draw_data_web', 'user_name': user_name, 'lines': lines }, room=conn_id)
-
-class PlayerNamespace(Namespace):
-
-    def __init__(self, *args, **kwargs):
-        super(PlayerNamespace, self).__init__(*args, **{key: kwargs[key] for key in kwargs if key != 'parent'})
-
-        if 'parent' not in kwargs:
-            raise ValueError("'parent' keyword not found in namespace init")
-
-        self.parent = kwargs['parent']
-
-    def on_connect(self):
-        logger.info('Player {} connected'.format(request.sid))
-        self.parent.register_player_connect(request.sid)
-
-    def on_disconnect(self):
-        logger.info('Player {} disconnected'.format(request.sid))
-        room_id = self.parent.register_player_disconnect(request.sid)
-
-        if room_id is not None:
-            leave_room(request.sid, room_id)
-
-    def on_join_room(self, data):
-        room_number = data['room_nume']
-        user_name = data['user_name']
-
-        room_id = self.parent.join_room_message(request.sid, room_number, user_name)
-
-        if room_id is not None:
-            join_room(request.sid, room_id)
-
-    def on_draw_data_ios_move(self, data):
-        color = data['color']
-        points = data['points']
-        screen_dim = data['screen_dim']
-
-        self.parent.draw_data_message(request.sid, points, screen_dim, color)
-
-    def send_join_room_status(self, player_id, status):
-        self.emit('join_room_status', status, room=player_id)
-
-    def send_state_game(self, room_id, prompt_player_pairs):
-        self.emit('start_game', { 'pkt_type': 'start_game', 'prompts': prompt_player_pairs }, room=room_id)
-
 class Server:
     def __init__(self, web_namespace_class, player_namespace_class):
         self.web_namespace_class = web_namespace_class
@@ -111,8 +43,8 @@ class Server:
 
     def register(self, socket_io):
         self.socket_io = socket_io
-        self.web_namespace = self.web_namespace_class('/game/web', parent=self)
-        self.player_namespace = self.player_namespace_class('/game/player', parent=self)
+        self.web_namespace = self.web_namespace_class(WEB_ENDPOINT, parent=self)
+        self.player_namespace = self.player_namespace_class(PLAYER_ENDPOINT, parent=self)
 
         socket_io.on_namespace(self.web_namespace)
         socket_io.on_namespace(self.player_namespace)
@@ -122,7 +54,8 @@ class Server:
         self.players[player_id] = {
             'player_id': player_id,
             'user_name': None,
-            'lounge_id': None
+            'lounge_id': None,
+            'screen_dim': None
         }
 
     def register_player_disconnect(self, player_id):
@@ -144,7 +77,7 @@ class Server:
             return None
 
     def register_web_connect(self, web_id):
-        self.lounge_id = self.generate_lounge_id()
+        lounge_id = self.generate_lounge_id()
 
         # Create web connection object
         self.web_connections[web_id] = {
@@ -157,7 +90,18 @@ class Server:
             'lounge_id': lounge_id,
             'player_clients': [],
             'web_client': web_id,
+            'lines': {}
         }
+
+        # lines schema
+        # {
+        #     "<player_id>": {
+        #         "lines": [
+        #             { "color": "...", "points": [ { "x": "x value", "y": "y value" } ] }
+        #         ],
+        #         "last_active": "<bool>"
+        #     }
+        # }
 
         # Tell web connection that they belong to the specified lounge
         self.web_namespace.send_new_room(web_id, lounge_id)
@@ -177,7 +121,7 @@ class Server:
             # Try to delete the lounge if it is empty
             self.try_lounge_cleanup(lounge, lounge_id)
 
-    def join_room_message(self, player_id, room_number, user_name):
+    def join_room_message(self, player_id, room_number, user_name, screen_dim):
         player = self.players[player_id]
 
         # If the lounge exists
@@ -186,8 +130,10 @@ class Server:
 
             # Add the player to the lounge and give them a user name
             lounge['player_clients'].append(player_id)
+            lounge['lines'][player_id] = []
             player['lounge_id'] = room_number
             player['user_name'] = user_name
+            player['screen_dim'] = screen_dim
 
             # Then generate the list of current players in the lounge and send it to the front end
             current_players = [ { 'user_name': self.players[in_game_player_id]['user_name']} \
@@ -198,8 +144,34 @@ class Server:
         else:
             return None
 
-    def draw_data_message(self, player_id, points, screen_dim, color):
-        pass
+    def draw_data_message(self, player_id, points, color):
+        player = self.players[player_id]
+        user_name = player['user_name']
+
+        if player['lounge_id'] is not None and player['lounge_id'] in self.lounges:
+            lounge = self.lounges[player['lounge_id']]
+
+            web_client_id = lounge['web_client']
+
+            # Update lines stored in lounge if the last line is continuing
+            lounge['lines'][player_id].append({
+                'points': points,
+                'color': color
+            })
+
+            # Send complete updated picture for originating player to web connection
+            self.send_web_complete_picture(lounge, player_id, web_client_id)
+
+    def draw_data_end_line_message(self, player_id):
+        player = self.players[player]
+
+    def send_web_complete_picture(self, lounge, player_id, web_id):
+        lines = lounge['lines'][player_id]
+        player = self.players[player_id]
+
+        screen_dim = player['screen_dim']
+        user_name = player['user_name']
+        self.web_namespace.send_draw_data(web_id, user_name, screen_dim, lines)
 
     def try_cleanup_lounge(self, lounge, lounge_id):
         if lounge['player_client'] is not None and \
@@ -208,7 +180,9 @@ class Server:
                del self.lounges[lounge_id]
 
     def generate_lounge_id(self):
-        return "{:030x}".format(random.randrange(16**30))
+        format_str = ("{:0" + str(IDENTIFIER_LEN) + "x}")
+        num = random.randrange(16**IDENTIFIER_LEN)
+        return format_str.format(num).upper()
 
 server = Server(WebNamespace, PlayerNamespace)
 server.register(socketio)
