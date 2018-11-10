@@ -12,11 +12,9 @@ class WebNamespace(Namespace):
         self.parent = kwargs['parent']
 
     def on_connect(self):
-        logger.info('Web interface {} connected'.format(request.sid))
         self.parent.register_web_connect(request.sid)
 
     def on_disconnect(self):
-        logger.info('Web interface {} disconnected'.format(request.sid))
         self.parent.register_web_disconnect(request.sid)
 
     def send_new_room(self, conn_id, room_number):

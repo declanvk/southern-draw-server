@@ -17,7 +17,7 @@ logger.setLevel(logging.DEBUG)
 app = Flask(__name__)
 app.config['STATIC_FOLDER'] = Path(getenv("SOUTHERN_STATIC_FOLDER", default='static/'))
 app.config['SECRET_KEY'] = 'this is a big fat secret! don\'t tell anyone'
-socketio = SocketIO(app)
+socketio = SocketIO(app, logger=logger)
 
 # Handle first page
 @app.route('/')
@@ -140,8 +140,10 @@ class Server:
                         for in_game_player_id in lounge['player_clients'] ]
             self.web_namespace.send_all_players(lounge['web_client'], current_players)
 
+            self.player_namespace.send_join_room_status(player_id, 'ok')
             return room_number
         else:
+            self.player_namespace.send_join_room_status(player_id, 'not ok')
             return None
 
     def draw_data_message(self, player_id, points, color):
