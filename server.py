@@ -144,7 +144,7 @@ class Server:
             return None
 
     def register_web_connect(self, web_id):
-        self.lounge_id = self.generate_lounge_id()
+        lounge_id = self.generate_lounge_id()
 
         # Create web connection object
         self.web_connections[web_id] = {
