@@ -1,0 +1,9 @@
+setup:
+  config: {}
+build:
+  languages:
+    - python
+  pre:
+    - ./script/build_static.sh
+run:
+  web: 'gunicorn --log-level debug --worker-class eventlet -w 1 server:app'
