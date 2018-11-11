@@ -11,7 +11,7 @@ from prompts import get_prompt
 IDENTIFIER_LEN = 6
 TIMER_LEN = 15
 FUDGE_TIME = 2
-PLAYERS_PER_ROOM = 2
+PLAYERS_PER_ROOM = 1
 WEB_ENDPOINT = '/game/web'
 PLAYER_ENDPOINT = '/game/player'
 
