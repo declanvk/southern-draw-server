@@ -221,6 +221,7 @@ class Server:
 
         screen_dim = player['screen_dim']
         user_name = player['user_name']
+        print([len(line['points']) for line in player_lines['lines']])
         self.web_namespace.send_draw_data(web_id, user_name,
                                           screen_dim, player_lines['lines'])
 
@@ -231,7 +232,7 @@ class Server:
                del self.lounges[lounge_id]
 
     def generate_lounge_id(self):
-        return ''.join(choices(ascii_lowercase, k=IDENTIFIER_LEN))
+        return ''.join(choices(ascii_lowercase, k=IDENTIFIER_LEN)).upper()
 
 server = Server(WebNamespace, PlayerNamespace)
 server.register(socketio)
