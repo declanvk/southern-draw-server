@@ -208,7 +208,7 @@ class Server:
         player = self.players[player_id]
 
         if player['lounge_id'] is not None:
-            lounge = player['lounge_id']
+            lounge = self.lounges[player['lounge_id']]
 
             player_lines = lounge['player_lines'][player_id]
             player_lines['last_active'] = False
