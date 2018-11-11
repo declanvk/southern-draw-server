@@ -9,7 +9,7 @@ SCRIPTS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 git checkout release
 git merge master
-(git commit; exit 0)
+git commit || echo ""
 
 ${SCRIPTS_DIR}/build_static.sh
 
