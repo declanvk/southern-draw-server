@@ -16,7 +16,8 @@ ${SCRIPTS_DIR}/build_static.sh
 
 WEBSITE_DIR="${SCRIPTS_DIR}/../website"
 
-cp -r $WEBSITE_DIR/dist/ static/
+rm -r $SCRIPTS_DIR/../static/
+cp -R $WEBSITE_DIR/dist static/
 
 git push heroku-dev release:master
 
