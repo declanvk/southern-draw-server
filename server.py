@@ -92,10 +92,10 @@ class Server:
             'lounge_id': lounge_id,
             'player_clients': [],
             'web_client': web_id,
-            'lines': {}
+            'player_lines': {}
         }
 
-        # lines schema
+        # player_lines schema
         # {
         #     "<player_id>": {
         #         "lines": [
@@ -132,7 +132,11 @@ class Server:
 
             # Add the player to the lounge and give them a user name
             lounge['player_clients'].append(player_id)
-            lounge['lines'][player_id] = []
+            lounge['player_lines'][player_id] = {
+                'lines': [],
+                'last_active': False
+            }
+
             player['lounge_id'] = room_number
             player['user_name'] = user_name
             player['screen_dim'] = screen_dim
@@ -157,25 +161,46 @@ class Server:
 
             web_client_id = lounge['web_client']
 
-            # Update lines stored in lounge if the last line is continuing
-            lounge['lines'][player_id].append({
-                'points': points,
-                'color': color
-            })
+            # player_lines schema
+            # {
+            #     "<player_id>": {
+            #         "lines": [
+            #             { "color": "...", "points": [ { "x": "x value", "y": "y value" } ] }
+            #         ],
+            #         "last_active": "<bool>"
+            #     }
+            # }
+
+            player_lines = lounge['player_lines'][player_id]
+
+            if player_lines['last_active']:
+                player_lines['lines'][-1]['points'].append(points)
+            else:
+                player_lines['lines'].append({
+                    'points': points,
+                    'color': color
+                })
 
             # Send complete updated picture for originating player to web connection
             self.send_web_complete_picture(lounge, player_id, web_client_id)
 
     def draw_data_end_line_message(self, player_id):
-        player = self.players[player]
+        player = self.players[player_id]
+
+        lounge = player['lounge_id']
+
+        player_lines = lounge['player_lines'][player_id]
+        player_lines['last_active'] = False
+
 
     def send_web_complete_picture(self, lounge, player_id, web_id):
-        lines = lounge['lines'][player_id]
+        player_lines = lounge['player_lines'][player_id]
         player = self.players[player_id]
 
         screen_dim = player['screen_dim']
         user_name = player['user_name']
-        self.web_namespace.send_draw_data(web_id, user_name, screen_dim, lines)
+        self.web_namespace.send_draw_data(web_id, user_name,
+                                          screen_dim, player_lines['lines'])
 
     def try_lounge_cleanup(self, lounge, lounge_id):
         if lounge.get('player_clients') is not None and \
