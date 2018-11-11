@@ -189,6 +189,16 @@ class Server:
         player = self.players[player_id]
         user_name = player['user_name']
 
+        # player_lines schema
+        # {
+        #     "<player_id>": {
+        #         "lines": [
+        #             { "color": "...", "points": [ { "x": "x value", "y": "y value" } ] }
+        #         ],
+        #         "last_active": "<bool>"
+        #     }
+        # }
+
         if player['lounge_id'] is not None and player['lounge_id'] in self.lounges:
             lounge = self.lounges[player['lounge_id']]
 
@@ -197,12 +207,15 @@ class Server:
             player_lines = lounge['player_lines'][player_id]
 
             if player_lines['last_active']:
-                player_lines['lines'][-1]['points'].append(points)
+                player_lines['lines'][-1]['points'].extend(points)
             else:
                 player_lines['lines'].append({
                     'points': points,
                     'color': color
                 })
+
+                # This is the new last line
+                player_lines['last_active'] = True
 
             # Send complete updated picture for originating player to web connection
             self.send_web_complete_picture(lounge, player_id, web_client_id)
