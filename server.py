@@ -7,7 +7,7 @@ from namespaces import WebNamespace, PlayerNamespace
 from threading import Timer
 from prompts import get_prompt
 from string import ascii_lowercase
-from random import choice
+from random import choices
 
 IDENTIFIER_LEN = 6
 TIMER_LEN = 15
@@ -231,7 +231,7 @@ class Server:
                del self.lounges[lounge_id]
 
     def generate_lounge_id(self):
-        return ''.join(choice(ascii_lowercase, k=IDENTIFIER_LEN))
+        return ''.join(choices(ascii_lowercase, k=IDENTIFIER_LEN))
 
 server = Server(WebNamespace, PlayerNamespace)
 server.register(socketio)
