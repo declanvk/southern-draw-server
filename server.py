@@ -161,16 +161,6 @@ class Server:
 
             web_client_id = lounge['web_client']
 
-            # player_lines schema
-            # {
-            #     "<player_id>": {
-            #         "lines": [
-            #             { "color": "...", "points": [ { "x": "x value", "y": "y value" } ] }
-            #         ],
-            #         "last_active": "<bool>"
-            #     }
-            # }
-
             player_lines = lounge['player_lines'][player_id]
 
             if player_lines['last_active']:
@@ -187,10 +177,11 @@ class Server:
     def draw_data_end_line_message(self, player_id):
         player = self.players[player_id]
 
-        lounge = player['lounge_id']
+        if player['lounge_id'] is not None:
+            lounge = player['lounge_id']
 
-        player_lines = lounge['player_lines'][player_id]
-        player_lines['last_active'] = False
+            player_lines = lounge['player_lines'][player_id]
+            player_lines['last_active'] = False
 
 
     def send_web_complete_picture(self, lounge, player_id, web_id):
