@@ -101,6 +101,8 @@ class Server:
             "game_state": "starting" # possible states: "starting", "running", "complete"
         }
 
+        print("New lounge {}".format(lounge_id))
+
         # player_lines schema
         # {
         #     "<player_id>": {
