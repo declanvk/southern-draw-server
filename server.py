@@ -12,7 +12,7 @@ from random import choices
 IDENTIFIER_LEN = 6
 TIMER_LEN = 15
 FUDGE_TIME = 2
-PLAYERS_PER_ROOM = 1
+PLAYERS_PER_ROOM = 2
 WEB_ENDPOINT = '/game/web'
 PLAYER_ENDPOINT = '/game/player'
 
