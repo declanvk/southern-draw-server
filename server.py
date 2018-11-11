@@ -2,11 +2,12 @@ from flask import Flask, send_from_directory, request
 from flask_socketio import SocketIO, Namespace, emit, join_room, leave_room
 from os import getenv
 from pathlib import Path
-import random
 import logging
 from namespaces import WebNamespace, PlayerNamespace
 from threading import Timer
 from prompts import get_prompt
+from string import ascii_lowercase
+from random import choice
 
 IDENTIFIER_LEN = 6
 TIMER_LEN = 15
@@ -230,9 +231,7 @@ class Server:
                del self.lounges[lounge_id]
 
     def generate_lounge_id(self):
-        format_str = ("{:0" + str(IDENTIFIER_LEN) + "x}")
-        num = random.randrange(16**IDENTIFIER_LEN)
-        return format_str.format(num).upper()
+        return ''.join(choice(ascii_lowercase, k=IDENTIFIER_LEN))
 
 server = Server(WebNamespace, PlayerNamespace)
 server.register(socketio)
