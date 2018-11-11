@@ -153,8 +153,6 @@ class Server:
             # Then generate the list of current players in the lounge and send it to the front end
             current_players = [ { 'user_name': self.players[in_game_player_id]['user_name']} \
                         for in_game_player_id in lounge['player_clients'] ]
-            print(lounge['player_clients'])
-            print(current_players)
             self.web_namespace.send_all_players(lounge['web_client'], current_players)
 
             self.player_namespace.send_join_room_status(player_id, 'ok')
@@ -237,7 +235,6 @@ class Server:
 
         screen_dim = player['screen_dim']
         user_name = player['user_name']
-        print([len(line['points']) for line in player_lines['lines']])
         self.web_namespace.send_draw_data(web_id, user_name,
                                           screen_dim, player_lines['lines'])
 
