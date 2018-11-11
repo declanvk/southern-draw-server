@@ -86,11 +86,10 @@ class PlayerNamespace(Namespace):
 
         color = payload['color']
         points = payload['points']
-        screen_dim = payload['screen_dim']
 
-        self.parent.draw_data_message(request.sid, points, screen_dim, color)
+        self.parent.draw_data_message(request.sid, points, color)
 
-    def on_draw_data_ios_end_line(self, data):
+    def on_draw_data_ios_end_line(self):
         self.parent.draw_data_end_line_message(request.sid)
 
     def send_join_room_status(self, player_id, status):
