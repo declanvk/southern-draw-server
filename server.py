@@ -158,7 +158,7 @@ class Server:
 
             if len(lounge['player_clients']) == PLAYERS_PER_ROOM:
                 # Start game
-                louge['game_state'] = 'running'
+                lounge['game_state'] = 'running'
 
                 # Tell the web client the usernames of the players
                 user_names = [self.players[player_id]['user_name'] for player_id in lounge['player_clients']]
