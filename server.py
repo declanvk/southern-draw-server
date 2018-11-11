@@ -5,8 +5,13 @@ from pathlib import Path
 import random
 import logging
 from namespaces import WebNamespace, PlayerNamespace
+from threading import Timer
+from prompts import get_prompt
 
 IDENTIFIER_LEN = 6
+TIMER_LEN = 15
+FUDGE_TIME = 2
+PLAYERS_PER_ROOM = 2
 WEB_ENDPOINT = '/game/web'
 PLAYER_ENDPOINT = '/game/player'
 
@@ -92,7 +97,8 @@ class Server:
             'lounge_id': lounge_id,
             'player_clients': [],
             'web_client': web_id,
-            'player_lines': {}
+            'player_lines': {},
+            "game_state": "starting" # possible states: "starting", "running", "complete"
         }
 
         # player_lines schema
@@ -147,6 +153,28 @@ class Server:
             self.web_namespace.send_all_players(lounge['web_client'], current_players)
 
             self.player_namespace.send_join_room_status(player_id, 'ok')
+
+            if len(lounge['player_clients']) == PLAYERS_PER_ROOM:
+                # Start game
+                louge['game_state'] = 'running'
+
+                # Tell the web client the usernames of the players
+                user_names = [self.players[player_id]['user_name'] for player_id in lounge['player_clients']]
+                self.web_namespace.send_start_game(lounge['web_client'], user_names)
+
+                # Tell each player their prompt
+                for player_id in lounge['player_clients']:
+                    prompt = get_prompt()
+                    self.player_namespace.send_start_game(player_id, prompt)
+
+                def on_game_end():
+                    lounge['game_state'] = 'complete'
+                    print("Game of {} has ended".format(lounge['player_clients']))
+
+                t = Timer(TIMER_LEN + FUDGE_TIME, on_game_end)
+
+                t.start()
+
             return room_number
         else:
             self.player_namespace.send_join_room_status(player_id, 'not ok')

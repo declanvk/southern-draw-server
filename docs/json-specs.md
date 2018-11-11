@@ -56,8 +56,7 @@ Sent from server to web when the game starts
 ```json
 {
     "pkt_name": "start_game_web",
-    "player1" : "name (String)",
-    "player2" : "name (String)"
+    "player_user_names": [ "name (String)", "..."],
 }
 ```
 

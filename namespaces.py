@@ -41,6 +41,9 @@ class WebNamespace(Namespace):
             'lines': lines
         }, room=conn_id)
 
+    def send_start_game(self, conn_id, player_names):
+        self.emit('start_game', { 'pkt_type': 'start_game_web', 'player_user_names': player_names }, room=conn_id)
+
 class PlayerNamespace(Namespace):
 
     def __init__(self, *args, **kwargs):
@@ -71,8 +74,6 @@ class PlayerNamespace(Namespace):
         user_name = payload['user_name']
         screen_dim = payload['screen_dim']
 
-
-
         logger.info("Player {} request to join room {}.".format(request.sid, room_number))
         print("Player {} request to join room {}.".format(request.sid, room_number))
 
@@ -95,5 +96,5 @@ class PlayerNamespace(Namespace):
     def send_join_room_status(self, player_id, status):
         self.emit('join_room_status', status, room=player_id)
 
-    def send_state_game(self, room_id, prompt_player_pairs):
-        self.emit('start_game', { 'pkt_type': 'start_game', 'prompts': prompt_player_pairs }, room=room_id)
+    def send_start_game(self, player_id, prompt):
+        self.emit('start_game_ios', { 'pkt_type': 'start_game_ios', 'prompt': prompt }, room=player_id)
