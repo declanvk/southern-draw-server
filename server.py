@@ -153,6 +153,8 @@ class Server:
             # Then generate the list of current players in the lounge and send it to the front end
             current_players = [ { 'user_name': self.players[in_game_player_id]['user_name']} \
                         for in_game_player_id in lounge['player_clients'] ]
+            print(lounge['player_clients'])
+            print(current_players)
             self.web_namespace.send_all_players(lounge['web_client'], current_players)
 
             self.player_namespace.send_join_room_status(player_id, 'ok')
@@ -208,6 +210,7 @@ class Server:
     def draw_data_end_line_message(self, player_id):
         player = self.players[player_id]
 
+        print("End message for", player_id)
         if player['lounge_id'] is not None:
             lounge = self.lounges[player['lounge_id']]
 
