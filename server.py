@@ -14,8 +14,10 @@ PLAYER_ENDPOINT = '/game/player'
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-app = Flask(__name__)
-app.config['STATIC_FOLDER'] = Path(getenv("SOUTHERN_STATIC_FOLDER", default='static/'))
+STATIC_FOLDER = getenv("SOUTHERN_STATIC_FOLDER", default='static')
+
+app = Flask(__name__, static_folder=STATIC_FOLDER)
+app.config['STATIC_FOLDER'] = Path(STATIC_FOLDER)
 app.config['SECRET_KEY'] = 'this is a big fat secret! don\'t tell anyone'
 socketio = SocketIO(app, logger=logger)
 
@@ -67,7 +69,7 @@ class Server:
             lounge = self.lounges[lounge_id]
 
             # If it does, remove the disconnecting player
-            lounge['player_client'].remove(player_id)
+            lounge['player_clients'].remove(player_id)
 
             # Attempt to delete the lounge
             self.try_lounge_cleanup(lounge, lounge_id)
@@ -175,9 +177,9 @@ class Server:
         user_name = player['user_name']
         self.web_namespace.send_draw_data(web_id, user_name, screen_dim, lines)
 
-    def try_cleanup_lounge(self, lounge, lounge_id):
-        if lounge['player_client'] is not None and \
-               len(lounge['player_client']) == 0 and \
+    def try_lounge_cleanup(self, lounge, lounge_id):
+        if lounge.get('player_clients') is not None and \
+               len(lounge['player_clients']) == 0 and \
                lounge['web_client'] is None:
                del self.lounges[lounge_id]
 

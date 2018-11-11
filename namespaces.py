@@ -1,6 +1,8 @@
 from flask import request
 from flask_socketio import Namespace, emit, join_room, leave_room
 
+from json import loads
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -63,11 +65,16 @@ class PlayerNamespace(Namespace):
             leave_room(request.sid, room_id)
 
     def on_join_room(self, data):
-        room_number = data['room_number']
-        user_name = data['user_name']
-        screen_dim = data['screen_dim']
+        payload = loads(data)
+
+        room_number = payload['room_number']
+        user_name = payload['user_name']
+        screen_dim = payload['screen_dim']
+
+
 
         logger.info("Player {} request to join room {}.".format(request.sid, room_number))
+        print("Player {} request to join room {}.".format(request.sid, room_number))
 
         room_id = self.parent.join_room_message(request.sid, room_number, user_name, screen_dim)
 
@@ -75,13 +82,14 @@ class PlayerNamespace(Namespace):
             join_room(request.sid, room_id)
 
     def on_draw_data_ios_move(self, data):
-        color = data['color']
-        points = data['points']
-        screen_dim = data['screen_dim']
+        payload = loads(data)
 
-        self.parent.draw_data_message(request.sid, points, screen_dim, color)
+        color = payload['color']
+        points = payload['points']
 
-    def on_draw_data_ios_end_line(self, data):
+        self.parent.draw_data_message(request.sid, points, color)
+
+    def on_draw_data_ios_end_line(self):
         self.parent.draw_data_end_line_message(request.sid)
 
     def send_join_room_status(self, player_id, status):
