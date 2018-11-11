@@ -11,7 +11,7 @@ git checkout release
 git merge master
 git commit
 
-./${SCRIPTS_DIR}/build_static.sh
+${SCRIPTS_DIR}/build_static.sh
 
 WEBSITE_DIR="${SCRIPTS_DIR}/../website"
 

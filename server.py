@@ -14,8 +14,10 @@ PLAYER_ENDPOINT = '/game/player'
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-app = Flask(__name__)
-app.config['STATIC_FOLDER'] = Path(getenv("SOUTHERN_STATIC_FOLDER", default='static/'))
+STATIC_FOLDER = getenv("SOUTHERN_STATIC_FOLDER", default='static')
+
+app = Flask(__name__, static_folder=STATIC_FOLDER)
+app.config['STATIC_FOLDER'] = Path(STATIC_FOLDER)
 app.config['SECRET_KEY'] = 'this is a big fat secret! don\'t tell anyone'
 socketio = SocketIO(app, logger=logger)
 
